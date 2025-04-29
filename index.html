@@ -3,11 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scam Checker</title>
+    <title>Alin's Scam Checker</title>
     <style>
-        body { font-family: Arial, sans-serif; }
-        form { max-width: 400px; margin: 50px auto; }
-        input, select, button { display: block; width: 100%; margin: 10px 0; padding: 10px; }
+        input, select, button {
+        display: block;
+        width: 100%;
+        margin: 10px 0;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 16px;
+        box-sizing: border-box;
+
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color:  #FBE9D0;
+            color:  #244855;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #244855;
+        }
+
+        form {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        input, select, button {
+            display: block;
+            width: 100%;
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        button {
+            background-color:  #E64833;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #d6422e;
+        }
+
+        #result {
+            text-align: center;
+            font-size: 18px;
+            margin-top: 20px;
+        }
+
+        #dismissBtn {
+            display: block;
+            margin: 20px auto;
+            background-color: #E64833;
+            color: #fff;
+        }
+
+        #dismissBtn:hover {
+            background-color: #d82e4a;
+        }
+
+        #loadEntries {
+
+            display: block;
+            width: 100%;
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+            background-color: #244855;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #loadEntries:hover {
+            background-color: #244865;
+        }
+
+        ul {
+            max-width: 400px;
+            margin: 20px auto;
+            padding: 0;
+            list-style: none;
+        }
+
+        ul li {
+            background: #fff;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
     </style>
 </head>
 <body>
@@ -20,7 +132,7 @@
         </select>
 
         <label for="value">Value:</label>
-        <input type="text" id="value" name="value" placeholder="Enter email or phone number" required />
+        <input type="text" id="value" name="value" placeholder="Enter an email address or phone number" required />
 
         <button type="submit">Check</button>
     </form>
@@ -28,51 +140,50 @@
 
     <button id="dismissBtn" style="display:none;">Dismiss</button>
 
-    <h2>Scam Entries</h2>
-<button id="loadEntries">Load Entries</button>
-<ul id="entriesList"></ul>
+    <h2>Scam Database</h2>
+    <button id="loadEntries">Load</button>
+    <ul id="entriesList"></ul>
 
     <script>
         const form = document.getElementById("scamForm");
         const result = document.getElementById("result");
         const dismissBtn = document.getElementById("dismissBtn");
 
-form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const type = document.getElementById("type").value;
-    const value = document.getElementById("value").value;
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const type = document.getElementById("type").value;
+            const value = document.getElementById("value").value;
 
-    const response = await fetch("http://localhost:3000/check", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type, value }),
-    });
+            const response = await fetch("http://localhost:3000/check", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ type, value }),
+            });
 
-    const data = await response.json();
-    result.textContent = data.message;
-    result.style.display = "block";
-    dismissBtn.style.display = "inline-block";
-});
+            const data = await response.json();
+            result.textContent = data.message;
+            result.style.display = "block";
+            dismissBtn.style.display = "inline-block";
+        });
 
-document.getElementById("loadEntries").addEventListener("click", async () => {
-    const response = await fetch("http://localhost:3000/entries");
-    const entries = await response.json();
+        document.getElementById("loadEntries").addEventListener("click", async () => {
+            const response = await fetch("http://localhost:3000/entries");
+            const entries = await response.json();
 
-    const entriesList = document.getElementById("entriesList");
-    entriesList.innerHTML = "";
+            const entriesList = document.getElementById("entriesList");
+            entriesList.innerHTML = "";
 
-    entries.forEach(entry => {
-        const li = document.createElement("li");
-        li.textContent = `${entry.type}: ${entry.value}`;
-        entriesList.appendChild(li);
-    });
-});
+            entries.forEach(entry => {
+                const li = document.createElement("li");
+                li.textContent = `${entry.type}: ${entry.value}`;
+                entriesList.appendChild(li);
+            });
+        });
 
-dismissBtn.addEventListener("click", () => {
-    result.textContent = "";
-    dismissBtn.style.display = "none";
-});
-
+        dismissBtn.addEventListener("click", () => {
+            result.textContent = "";
+            dismissBtn.style.display = "none";
+        });
     </script>
 </body>
 </html>

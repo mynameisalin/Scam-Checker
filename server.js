@@ -36,6 +36,7 @@ app.post("/check", (req, res) => {
 app.get("/entries", (req, res) => {
     db.all("SELECT * FROM scams", [], (err, rows) => {
         if (err) {
+            console.error("Database error:", err);
             return res.status(500).json({ message: "Database error." });
         }
         res.json(rows);
