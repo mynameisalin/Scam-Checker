@@ -6,21 +6,20 @@
     <title>Alin's Scam Checker</title>
     <style>
         input, select, button {
-        display: block;
-        width: 100%;
-        margin: 10px 0;
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        font-size: 16px;
-        box-sizing: border-box;
-
+            display: block;
+            width: 100%;
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
         }
-        
+
         body {
             font-family: 'Arial', sans-serif;
-            background-color:  #FBE9D0;
-            color:  #244855;
+            background-color: #FBE9D0;
+            color: #244855;
             margin: 0;
             padding: 0;
             line-height: 1.6;
@@ -46,18 +45,8 @@
             display: block;
         }
 
-        input, select, button {
-            display: block;
-            width: 100%;
-            margin: 10px 0;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 16px;
-        }
-
         button {
-            background-color:  #E64833;
+            background-color: #E64833;
             color: #fff;
             border: none;
             cursor: pointer;
@@ -79,6 +68,10 @@
             margin: 20px auto;
             background-color: #E64833;
             color: #fff;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
         }
 
         #dismissBtn:hover {
@@ -86,9 +79,7 @@
         }
 
         #loadEntries {
-
             display: block;
-            width: 100%;
             margin: 10px 0;
             padding: 10px;
             border: 1px solid #ccc;
@@ -106,19 +97,39 @@
             background-color: #244865;
         }
 
-        ul {
-            max-width: 400px;
+        #entriesContainer {
+            display: none; 
+            justify-content: space-between;
+            align-items: flex-start;
+            max-width: 800px;
             margin: 20px auto;
+        }
+
+        .side-image {
+            width: 100px; 
+            height: auto;
+        }
+
+        #entriesList {
+            flex: 1; 
+            margin: 0 20px; 
             padding: 0;
             list-style: none;
         }
 
-        ul li {
+        #entriesList li {
             background: #fff;
             margin: 10px 0;
             padding: 10px;
             border-radius: 4px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        #toggleImage {
+            display: block;
+            margin: 10px auto;
+            width: 500px;
+            height: auto;
         }
     </style>
 </head>
@@ -132,7 +143,7 @@
         </select>
 
         <label for="value">Value:</label>
-        <input type="text" id="value" name="value" placeholder="Enter an email address or phone number" required />
+        <input type="text" id="value" name="value" placeholder="Enter email or phone number" required />
 
         <button type="submit">Check</button>
     </form>
@@ -140,14 +151,22 @@
 
     <button id="dismissBtn" style="display:none;">Dismiss</button>
 
-    <h2>Scam Database</h2>
-    <button id="loadEntries">Load</button>
-    <ul id="entriesList"></ul>
+    <h2>Scam Entries</h2>
+    <button id="loadEntries">Load Entries</button>
+    <img id="toggleImage" src="images/phishing.png" alt="Phishing Image" />
+    <div id="entriesContainer">
+        <img src="images/warning.png" alt="Left Image" class="side-image" />
+        <ul id="entriesList"></ul>
+        <img src="images/warning.png" alt="Right Image" class="side-image" />
+    </div>
 
     <script>
         const form = document.getElementById("scamForm");
         const result = document.getElementById("result");
         const dismissBtn = document.getElementById("dismissBtn");
+        const loadEntriesButton = document.getElementById("loadEntries");
+        const entriesContainer = document.getElementById("entriesContainer");
+        const toggleImage = document.getElementById("toggleImage");
 
         form.addEventListener("submit", async (e) => {
             e.preventDefault();
@@ -166,23 +185,35 @@
             dismissBtn.style.display = "inline-block";
         });
 
-        document.getElementById("loadEntries").addEventListener("click", async () => {
-            const response = await fetch("http://localhost:3000/entries");
-            const entries = await response.json();
-
-            const entriesList = document.getElementById("entriesList");
-            entriesList.innerHTML = "";
-
-            entries.forEach(entry => {
-                const li = document.createElement("li");
-                li.textContent = `${entry.type}: ${entry.value}`;
-                entriesList.appendChild(li);
-            });
-        });
-
         dismissBtn.addEventListener("click", () => {
             result.textContent = "";
             dismissBtn.style.display = "none";
+        });
+
+        loadEntriesButton.addEventListener("click", async () => {
+            if (entriesContainer.style.display === "none" || entriesContainer.style.display === "") {
+                
+                const response = await fetch("http://localhost:3000/entries");
+                const entries = await response.json();
+
+                const entriesList = document.getElementById("entriesList");
+                entriesList.innerHTML = "";
+
+                entries.forEach(entry => {
+                    const li = document.createElement("li");
+                    li.textContent = `${entry.type}: ${entry.value}`;
+                    entriesList.appendChild(li);
+                });
+
+                entriesContainer.style.display = "flex";
+                loadEntriesButton.textContent = "Close List";
+                toggleImage.style.display = "none"; 
+            } else {
+                
+                entriesContainer.style.display = "none";
+                loadEntriesButton.textContent = "Load Entries";
+                toggleImage.style.display = "block"; 
+            }
         });
     </script>
 </body>

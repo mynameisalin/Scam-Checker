@@ -19,14 +19,14 @@ app.post("/check", (req, res) => {
     }
 
     db.get("SELECT * FROM scams WHERE type = ? AND value = ?", [type, value], (err, row) => {
-        
-
         if (row) {
             return res.json({ exists: true, message: "This is a potential scam." });
         } else {
             db.run("INSERT INTO scams (type, value) VALUES (?, ?)", [type, value], (err) => {
-                
-                
+                if (err) {
+                    console.error("Database error:", err);
+                    return res.status(500).json({ message: "Database error." });
+                }
             });
             return res.json({ exists: false, message: "Added to the database." });
         }
@@ -42,7 +42,6 @@ app.get("/entries", (req, res) => {
         res.json(rows);
     });
 });
-
 
 const PORT = 3000;
 app.listen(PORT, () => {
